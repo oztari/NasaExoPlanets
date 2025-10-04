@@ -44,6 +44,14 @@
 
       return (
         <div className="grid md:grid-cols-3 gap-6">
+             <div className="mt-4 flex items-center gap-3">
+              <select className="select w-48" value={model} onChange={e => setModel(e.target.value as "rf" | "lr")}>
+                <option value="rf">Random Forest</option>
+                <option value="lr">Logistic Regression</option>
+              </select>
+              <button className="btn" onClick={handlePredict} disabled={busy}>{busy ? "Predicting..." : "Predict"}</button>
+              {error && <span className="text-red-400">{error}</span>}
+            </div>
           <section className="card md:col-span-2">
             <h2 className="text-xl font-semibold">Researcher Dashboard</h2>
             <div className="grid md:grid-cols-2 gap-4 mt-4">
@@ -61,14 +69,7 @@
               <ToggleField label="koi_fpflag_ec (eclipsing binary)" value={payload.koi_fpflag_ec ?? 0} onChange={v => set("koi_fpflag_ec", v)} />
             </div>
 
-            <div className="mt-4 flex items-center gap-3">
-              <select className="select w-48" value={model} onChange={e => setModel(e.target.value as "rf" | "lr")}>
-                <option value="rf">Random Forest</option>
-                <option value="lr">Logistic Regression</option>
-              </select>
-              <button className="btn" onClick={handlePredict} disabled={busy}>{busy ? "Predicting..." : "Predict"}</button>
-              {error && <span className="text-red-400">{error}</span>}
-            </div>
+         
           </section>
 
           <section className="card">
