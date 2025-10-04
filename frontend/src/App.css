@@ -1,42 +1,150 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  color: white;
+  background: black;
+  overflow: hidden;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    filter: brightness(1) drop-shadow(0 0 10px rgba(180, 160, 255, 0.4));
+  }
+  50% {
+    filter: brightness(1.1) drop-shadow(0 0 14px rgba(180, 160, 255, 0.6));
+  }
+}
+
+@keyframes textShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.hero {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   text-align: center;
+  background: radial-gradient(circle at top, rgba(100, 60, 255, 0.6), #000 70%),
+    url('https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&q=80&w=1920')
+      center/cover no-repeat;
+  animation: pulseGlow 8s ease-in-out infinite;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.hero::after {
+  content: "";
+  position: absolute;
+  bottom: -40%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 160vmin;
+  height: 160vmin;
+  background: radial-gradient(circle at 50% 20%, rgba(180, 160, 255, 0.8), rgba(0, 0, 0, 0) 70%);
+  border-radius: 50%;
+  filter: blur(20px);
+  z-index: 0;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+nav {
+  position: absolute;
+  top: 20px;
+  right: 50px;
+  display: flex;
+  gap: 30px;
+  font-size: 14px;
+  letter-spacing: 1px;
 }
 
-.card {
-  padding: 2em;
+nav a {
+  color: #ddd;
+  text-decoration: none;
+  transition: color 0.3s;
 }
 
-.read-the-docs {
-  color: #888;
+nav a:hover {
+  color: white;
+}
+
+h1 {
+  font-size: 80px;
+  z-index: 1;
+  position: relative;
+  font-weight: 800;
+  background: linear-gradient(
+    90deg,
+    rgba(230, 230, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(230, 230, 255, 0.4) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textShimmer 8s linear forwards;
+}
+
+h1 span {
+  display: inline-block;
+  transform: rotate(15deg);
+  color: #bbaaff;
+}
+
+h2 {
+  font-size: 18px;
+  margin-top: 10px;
+  letter-spacing: 4px;
+  color: rgba(255, 255, 255, 0.8);
+  z-index: 1;
+}
+
+p {
+  font-size: 14px;
+  margin-top: 5px;
+  color: rgba(255, 255, 255, 0.7);
+  z-index: 1;
+}
+
+.btn-container {
+  display: flex;
+  gap: 60px;
+  margin-top: 40px;
+  z-index: 1;
+}
+
+.btn {
+  background: linear-gradient(135deg, #7b5cff, #4e3aff);
+  color: white;
+  padding: 14px 40px;
+  border: none;
+  border-radius: 40px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+  z-index: 1;
+}
+
+.btn:hover {
+  background: linear-gradient(135deg, #a28bff, #7a64ff);
+  transform: translateY(-3px);
+}
+
+footer {
+  position: absolute;
+  bottom: 40px;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: rgba(255, 255, 255, 0.6);
 }

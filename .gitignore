@@ -8,3 +8,9 @@ __pycache__/
 # Ignore virtual environments
 venv/
 .env/
+
+# --- Virtual environments ---
+.venv/
+env/
+venv/
+ENV/
