@@ -1,33 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
+         <div className="hero">
+      <nav>
+        <a href="https://github.com/oztari/Nasa-Exoplanet-Detector" target="_blank" rel="noreferrer">
+          #Analysis Github
         </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
+        <a href="https://github.com/Hadiyahh/exoplanet-app" target="_blank" rel="noreferrer">
+          #Design Github
         </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+      </nav>
+
+      <h1>
+        A World Away<span>🚀</span>
+      </h1>
+      <h2>Hunting for Exoplanets with AI</h2>
+      <p>With Artificial Intelligence and Machine Learning</p>
+
+      <div className="btn-container">
+        <button
+          className="btn"
+          onClick={() => alert("Get ready to start your space journey!")}
+        >
+          For Researchers
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+        <button
+          className="btn"
+          onClick={() => alert("Welcome, Enthusiast! 🚀")}
+        >
+          For Enthusiasts
+        </button>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+
+      <footer>2025 NASA Space Apps Challenge</footer>
+    </div>
     </>
   )
 }
