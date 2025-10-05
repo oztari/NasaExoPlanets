@@ -1,7 +1,7 @@
 import axios from "axios"
 import type { KOIItem, ModelName, PredictPayload, PredictResponse } from "./types"
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000" || "https://noncalculable-unmurmurously-marybeth.ngrok-free.dev"
 
 export async function predict(payload: PredictPayload, model: ModelName = "rf") {
   const response = await axios.post<PredictResponse>(`${API_BASE}/predict?model=${model}`, payload)
