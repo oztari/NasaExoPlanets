@@ -44,6 +44,11 @@
 
       return (
         <div className="grid md:grid-cols-3 gap-6">
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
              <div className="mt-4 flex items-center gap-3">
               <select className="select w-48" value={model} onChange={e => setModel(e.target.value as "rf" | "lr")}>
                 <option value="rf">Random Forest</option>
