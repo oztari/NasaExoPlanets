@@ -233,7 +233,7 @@
 
 ---
 
-## 9) Decisions You Made — Rationale & What to Tell Reviewers
+## 9) Rationale
 
 1. **Targeted the pipeline triage, not confirmation.**
 
