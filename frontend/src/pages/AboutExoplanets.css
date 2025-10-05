@@ -1,0 +1,203 @@
+.page-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #000 0%, #1a0033 50%, #000 100%);
+  padding-top: 80px;
+  color: white;
+}
+
+.page-content {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.page-header h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #bbaaff, #7b5cff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+}
+
+.page-subtitle {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 2px;
+}
+
+.content-section {
+  margin-bottom: 3rem;
+}
+
+.content-section h2 {
+  font-size: 2rem;
+  color: #bbaaff;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid rgba(180, 160, 255, 0.3);
+  padding-bottom: 0.5rem;
+}
+
+.content-section p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 1.5rem;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.feature-card {
+  background: rgba(180, 160, 255, 0.1);
+  border: 1px solid rgba(180, 160, 255, 0.3);
+  border-radius: 15px;
+  padding: 2rem;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(180, 160, 255, 0.2);
+}
+
+.feature-card h3 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  color: #bbaaff;
+}
+
+.detection-methods {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.method-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(180, 160, 255, 0.2);
+  border-radius: 10px;
+  padding: 1.5rem;
+  transition: border-color 0.3s ease;
+}
+
+.method-card:hover {
+  border-color: rgba(180, 160, 255, 0.5);
+}
+
+.method-card h3 {
+  color: #bbaaff;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.method-card p {
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.method-stats {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.method-stats span {
+  background: rgba(180, 160, 255, 0.2);
+  color: #bbaaff;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+}
+
+.kepler-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 2rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.stat {
+  text-align: center;
+  background: rgba(180, 160, 255, 0.1);
+  border-radius: 10px;
+  padding: 1.5rem;
+  min-width: 150px;
+  flex: 1;
+}
+
+.stat h4 {
+  font-size: 2.5rem;
+  color: #bbaaff;
+  margin-bottom: 0.5rem;
+  font-weight: 800;
+}
+
+.stat p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.project-highlight {
+  background: linear-gradient(135deg, rgba(180, 160, 255, 0.1), rgba(123, 92, 255, 0.1));
+  border: 1px solid rgba(180, 160, 255, 0.3);
+  border-radius: 15px;
+  padding: 2rem;
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.project-highlight h3 {
+  color: #bbaaff;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.project-highlight p {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .page-content {
+    padding: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 2.5rem;
+  }
+
+  .content-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .feature-grid,
+  .detection-methods {
+    grid-template-columns: 1fr;
+  }
+
+  .kepler-stats {
+    flex-direction: column;
+  }
+
+  .stat {
+    min-width: unset;
+  }
+}
