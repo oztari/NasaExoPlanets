@@ -259,7 +259,7 @@ def versions():
     }
 
 @app.post("/predict")
-def predict(data: ExoplanetData, model: str = "rf"):
+def predict(data: ExoplanetData, model: str = "lr"):
     try:
         m, mapping = choose_model(model)
         df = pd.DataFrame([data.dict()])
@@ -268,15 +268,15 @@ def predict(data: ExoplanetData, model: str = "rf"):
         raw_pred = m.predict(df)[0]
         pred = remap_prediction(str(raw_pred), mapping)
 
-        proba = get_confidence(m, df)
+        proba = get_confidence(m, df) 
         if np.isnan(proba) or np.isinf(proba):
             proba = 0.0
+        proba = max(0.0, min(1.0, float(proba)))  
 
-        return {"prediction": pred, "confidence": round(float(proba), 3)}
+        return {"prediction": pred, "confidence": round(proba, 3)}
     except HTTPException:
         raise
     except Exception as e:
-        # Add a helpful hint for sklearn version mismatches (e.g., monotonic_cst)
         msg = str(e)
         if "monotonic_cst" in msg or "has no attribute 'monotonic_cst'" in msg:
             msg += " | Possible scikit-learn version mismatch between training and runtime. Check /versions and align sklearn versions."
