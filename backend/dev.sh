@@ -26,12 +26,21 @@ fi
 # 3b) Always ensure critical packages exist (self-healing)
 python3 - <<'EOF'
 import importlib, subprocess, sys
-needed = ["fastapi", "uvicorn", "pandas", "numpy", "scikit-learn", "joblib", "pydantic"]
-for pkg in needed:
+# map pip package names to importable module names
+needed = {
+    "fastapi": "fastapi",
+    "uvicorn[standard]": "uvicorn",
+    "pandas": "pandas",
+    "numpy": "numpy",
+    "scikit-learn": "sklearn",
+    "joblib": "joblib",
+    "pydantic": "pydantic",
+}
+for pip_name, module_name in needed.items():
     try:
-        importlib.import_module(pkg.split("[")[0])
+        importlib.import_module(module_name)
     except ImportError:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", pkg])
+        subprocess.check_call([sys.executable, "-m", "pip", "install", pip_name])
 EOF
 
 # 4) Run the server
@@ -43,7 +52,8 @@ while lsof -i :$current_port -sTCP:LISTEN -t >/dev/null ; do
 done
 
 echo "✅ Starting API on: http://127.0.0.1:$current_port"
+echo "Docs: http://127.0.0.1:$current_port/docs"
 echo " ----------------------------------------"
 
 echo "Press CTRL+C to stop."
-python3 -m uvicorn app:app --reload --port $current_port
+exec python3 -m uvicorn app:app --reload --port "$current_port"

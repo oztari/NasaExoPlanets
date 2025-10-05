@@ -1,61 +1,4 @@
-# 🚀 How to Run the Backend
-
-## 1️⃣ Go to the backend folder
-```bash
-cd backend
-
-2️⃣ Run the dev script
-
-bash ./dev.sh
-
-That script will:
-	•	Create a virtual environment (.venv)
-	•	Install or update all Python dependencies
-	•	Launch the FastAPI server
-
-You’ll see:
-
-✅ Starting API on: http://127.0.0.1:8000
-
-
-⸻
-
-3️⃣ Open your browser
-	•	Docs → http://127.0.0.1:8000/docs
-	•	Root → http://127.0.0.1:8000
-
-⸻
-
-4️⃣ (Optional) Manual start if script fails
-
-source .venv/bin/activate
-uvicorn app:app --reload --port 8000
-
-
-⸻
-
-5️⃣ Test Example
-
-curl -X POST "http://127.0.0.1:8000/predict?model=lr" \
-  -H "Content-Type: application/json" \
-  -d '{"koi_period":10.5,"koi_duration":3.2,"koi_depth":500,"koi_prad":1.9,"koi_model_snr":15,"koi_ror":0.03,"koi_impact":0.2,"koi_max_mult_ev":1,"koi_fpflag_ss":0,"koi_fpflag_co":0,"koi_fpflag_nt":0,"koi_fpflag_ec":0}'
-
-Expected response:
-
-{"prediction":"Confirmed","confidence":0.921}
-
-
-⸻
-
-6️⃣ Notes
-	•	Models live in backend/models/
-	•	Stop the server with CTRL + C
-	•	If you see version warnings for scikit-learn, install:
-
-python3 -m pip install scikit-learn==1.3.0
-
-
-# 🚀 How to Run the Backend
+# How to Run the Backend
 
 ## 1) Go to the backend folder
 ```bash
@@ -71,14 +14,14 @@ This script will:
 - install or update all Python dependencies
 - launch the FastAPI server
 
-You should see:
+You should see something like:
 ```
 ✅ Starting API on: http://127.0.0.1:8000
 ```
 
 ## 3) Open in your browser
-- **Docs:** http://127.0.0.1:8000/docs  
-- **Root:** http://127.0.0.1:8000
+- Docs: http://127.0.0.1:8000/docs
+- Root: http://127.0.0.1:8000
 
 ## 4) Manual start (if the script fails)
 ```bash
@@ -88,7 +31,7 @@ uvicorn app:app --reload --port 8000
 
 ## 5) Quick test
 ```bash
-curl -X POST "http://127.0.0.1:8000/predict?model=lr" \
+curl -X POST "http://127.0.0.1:8000/predict?model=rf" \
   -H "Content-Type: application/json" \
   -d '{
     "koi_period": 10.5,
@@ -105,26 +48,38 @@ curl -X POST "http://127.0.0.1:8000/predict?model=lr" \
     "koi_fpflag_ec": 0
   }'
 ```
-Expected response (values will vary):
-```json
-{
-  "prediction": "Confirmed",
-  "confidence": 0.921
-}
+
+## 6) Model files location
+The API expects models at:
+```
+notebooks/models/logistic_regression_pipeline.joblib
+notebooks/models/random_forest_pipeline.joblib
 ```
 
-## 6) Notes
-- Model files must exist here:
-  ```
-  backend/models/logistic_regression_pipeline.joblib
-  backend/models/random_forest_pipeline.joblib
-  ```
-- Stop the server with `CTRL + C`.
-- If you see scikit-learn version warnings, align versions:
+## 7) Troubleshooting sklearn version mismatch
+If you see an error like:
+```
+'DecisionTreeClassifier' object has no attribute 'monotonic_cst'
+```
+that indicates a scikit-learn version mismatch between the version used to train the models and your runtime.
+
+1. Inspect versions from the API:
+```bash
+curl http://127.0.0.1:8000/versions
+```
+You will get the runtime sklearn version and the versions the models were saved with.
+
+2. Align versions (choose one):
+- Pin runtime to the saved version (recommended):
   ```bash
-  python3 -m pip install "scikit-learn==1.3.0"
+  python3 -m pip install "scikit-learn==<saved_version>"
   ```
-  or retrain/resave the models with your current scikit-learn version.
+- Or re-export the models using your current runtime scikit-learn.
+
+3. Restart the server after changing packages.
+
+## 8) Misc
+- Stop the server with `CTRL + C`.
 - Clean reset:
   ```bash
   rm -rf .venv

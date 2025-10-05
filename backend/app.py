@@ -6,6 +6,7 @@ from typing import Optional, Dict, Any
 import joblib
 import numpy as np
 import pandas as pd
+import sklearn
 
 # ----------------------------
 # Model paths
@@ -32,6 +33,70 @@ app.add_middleware(
 # ----------------------------
 # Load models at startup
 # ----------------------------
+def _patch_sklearn_compat(obj):
+    """Best-effort patch for scikit-learn backward/forward compatibility.
+
+    - Adds missing attributes expected by newer sklearn versions on older pickles,
+      e.g., DecisionTreeClassifier.monotonic_cst used by RandomForest trees.
+    - Traverses common containers like Pipeline and ensembles.
+    """
+    try:
+        from sklearn.tree import DecisionTreeClassifier
+        from sklearn.pipeline import Pipeline
+    except Exception:
+        return
+
+    seen = set()
+
+    def visit(x):
+        if x is None:
+            return
+        try:
+            key = id(x)
+            if key in seen:
+                return
+            seen.add(key)
+        except Exception:
+            pass
+
+        # Direct estimator fixes
+        try:
+            if isinstance(x, DecisionTreeClassifier):
+                if not hasattr(x, "monotonic_cst"):
+                    # Default consistent with sklearn when not provided
+                    setattr(x, "monotonic_cst", None)
+        except Exception:
+            pass
+
+        # Pipelines
+        try:
+            if isinstance(x, Pipeline):
+                for step in x.named_steps.values():
+                    visit(step)
+        except Exception:
+            pass
+
+        # Common ensemble containers
+        for attr in ("estimators_", "estimators"):
+            try:
+                ests = getattr(x, attr, None)
+                if ests is not None:
+                    for e in ests:
+                        visit(e)
+            except Exception:
+                pass
+
+        # Base estimator pattern
+        for attr in ("base_estimator_", "base_estimator"):
+            try:
+                be = getattr(x, attr, None)
+                if be is not None:
+                    visit(be)
+            except Exception:
+                pass
+
+    visit(obj)
+
 @app.on_event("startup")
 def load_models():
     global lr_model, rf_model, lr_mapping, rf_mapping
@@ -56,11 +121,26 @@ def load_models():
             )
         return {raw: std for raw, std in zip(classes_sorted, STANDARD_ORDER)}
 
+    # Patch compatibility shims if needed
+    try:
+        _patch_sklearn_compat(lr_model)
+        _patch_sklearn_compat(rf_model)
+    except Exception:
+        pass
+
     lr_mapping = build_mapping(lr_model)
     rf_mapping = build_mapping(rf_model)
 
     print("LR classes:", getattr(lr_model, "classes_", None))
     print("RF classes:", getattr(rf_model, "classes_", None))
+
+    # Log sklearn versions to help diagnose pickle compatibility issues
+    try:
+        print("Runtime sklearn:", sklearn.__version__)
+        print("LR saved with sklearn:", get_saved_sklearn_version(lr_model))
+        print("RF saved with sklearn:", get_saved_sklearn_version(rf_model))
+    except Exception:
+        pass
 
 # ----------------------------
 # Request model
@@ -112,6 +192,39 @@ def remap_prediction(pred: Any, mapping: Dict[str, str]) -> str:
     pred_str = str(pred)
     return mapping.get(pred_str, pred_str)
 
+def get_saved_sklearn_version(model):
+    return getattr(model, "_sklearn_version", getattr(model, "__sklearn_version__", "unknown"))
+
+def get_confidence(model, X):
+    """Return a confidence score even if the estimator lacks predict_proba."""
+    import numpy as np
+
+    # Preferred: probabilities
+    if hasattr(model, "predict_proba"):
+        try:
+            return float(np.max(model.predict_proba(X)))
+        except Exception:
+            pass
+
+    # Fallback: decision_function -> sigmoid/softmax
+    if hasattr(model, "decision_function"):
+        try:
+            df = model.decision_function(X)
+            df = np.asarray(df)
+            if df.ndim == 1:
+                # binary distance to boundary
+                return float(1.0 / (1.0 + np.exp(-abs(df[0]))))
+            else:
+                # multiclass softmax
+                row = df[0] - np.max(df[0])
+                probs = np.exp(row) / np.sum(np.exp(row))
+                return float(np.max(probs))
+        except Exception:
+            pass
+
+    # Last resort
+    return 0.0
+
 def choose_model(name: str):
     name = (name or "").lower()
     if name == "lr":
@@ -132,6 +245,19 @@ def health():
     ok = all(x is not None for x in [globals().get("lr_model"), globals().get("rf_model")])
     return {"ok": ok}
 
+@app.get("/versions")
+def versions():
+    try:
+        lr_saved = get_saved_sklearn_version(globals().get("lr_model")) if globals().get("lr_model") is not None else None
+        rf_saved = get_saved_sklearn_version(globals().get("rf_model")) if globals().get("rf_model") is not None else None
+    except Exception:
+        lr_saved, rf_saved = None, None
+    return {
+        "runtime": sklearn.__version__,
+        "lr_saved": lr_saved,
+        "rf_saved": rf_saved,
+    }
+
 @app.post("/predict")
 def predict(data: ExoplanetData, model: str = "rf"):
     try:
@@ -140,19 +266,19 @@ def predict(data: ExoplanetData, model: str = "rf"):
         df = align_to_model_columns(df, m)
 
         raw_pred = m.predict(df)[0]
-        if not hasattr(m, "predict_proba"):
-            raise HTTPException(status_code=500, detail="model has no predict_proba")
-        proba = float(np.max(m.predict_proba(df)))
+        pred = remap_prediction(str(raw_pred), mapping)
 
-        pred = remap_prediction(raw_pred, mapping)
-
+        proba = get_confidence(m, df)
         if np.isnan(proba) or np.isinf(proba):
             proba = 0.0
 
-        return {"prediction": pred, "confidence": round(proba, 3)}
+        return {"prediction": pred, "confidence": round(float(proba), 3)}
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"prediction failed: {e}")
+        # Add a helpful hint for sklearn version mismatches (e.g., monotonic_cst)
+        msg = str(e)
+        if "monotonic_cst" in msg or "has no attribute 'monotonic_cst'" in msg:
+            msg += " | Possible scikit-learn version mismatch between training and runtime. Check /versions and align sklearn versions."
+        raise HTTPException(status_code=500, detail=f"prediction failed: {msg}")
     
-
