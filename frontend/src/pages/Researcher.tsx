@@ -106,21 +106,6 @@ export default function Researcher() {
 
   async function handlePredict() {
     try {
-      const payload = {
-        ...DEFAULTS,
-        koi_depth: sliders.depth,
-        koi_duration: sliders.duration,
-        koi_impact: sliders.impactParameter,
-        koi_max_mult_ev: sliders.maxMult,
-        koi_period: sliders.period,
-        koi_ror: sliders.radiusRatio,
-        koi_snr: sliders.snr,
-        koi_fpflag_ss: checkboxValues.fpflagSS,
-        koi_fpflag_co: checkboxValues.fpflagCO,
-        koi_fpflag_nt: checkboxValues.fpflagNT,
-        koi_fpflag_ec: checkboxValues.fpflagEC
-      }
-
       console.log("Payload", payload)
       setBusy(true); setError(null)
       const data = await predict(payload, model)

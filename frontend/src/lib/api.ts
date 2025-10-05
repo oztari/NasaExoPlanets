@@ -4,8 +4,9 @@ import type { KOIItem, ModelName, PredictPayload, PredictResponse } from "./type
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"
 
 export async function predict(payload: PredictPayload, model: ModelName = "rf") {
-  const { data } = await axios.post<PredictResponse>(`${API_BASE}/predict?model=${model}`, payload)
-  return data
+  const response = await axios.post<PredictResponse>(`${API_BASE}/predict?model=${model}`, payload)
+  console.log("Response ", response)
+  return response.data
 }
 
 export async function listKoi(): Promise<KOIItem[]> {

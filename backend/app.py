@@ -272,6 +272,8 @@ def predict(data: ExoplanetData, model: str = "rf"):
     if np.isnan(proba) or np.isinf(proba):
         proba = 0.0
 
+    return {"prediction": pred, "confidence": round(proba, 3)}
+
 @app.get("/versions")
 def versions():
     try:
