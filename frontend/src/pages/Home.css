@@ -47,3 +47,10 @@
     min-width: 150px;
   }
 }
+.quick-links {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.link { text-decoration: underline; }
