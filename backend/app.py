@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel  
 import joblib
 from pathlib import Path
@@ -34,6 +35,15 @@ def remap_prediction(pred: str, mapping: dict) -> str:
 # FastAPI setup
 # ----------------------------
 app = FastAPI(title="Exoplanet Classifier API")
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production, specify your frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Define expected input format
 class ExoplanetData(BaseModel):

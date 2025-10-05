@@ -21,17 +21,23 @@
 
     export default function Researcher() {
       const [payload, setPayload] = useState<PredictPayload>(DEFAULTS)
-      const [model, setModel] = useState<"rf" | "lr">("rf")
+      const [model, setModel] = useState<"rf" | "lr">("rf") // rf-randm forest, lr- logistic regression
       const [result, setResult] = useState<{prediction: string, confidence: number} | null>(null)
       const [busy, setBusy] = useState(false)
       const [error, setError] = useState<string | null>(null)
 
       async function handlePredict() {
+        console.log("🚀 Predict button clicked!", { payload, model });
+        console.log("📡 API URL:", `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"}/predict?model=${model}`);
         try {
           setBusy(true); setError(null)
           const data = await predict(payload, model)
+          console.log("✅ Success:", data);
           setResult(data)
         } catch (e: any) {
+          console.error("❌ Network Error Details:", e);
+          console.error("❌ Error Response:", e.response?.data);
+          console.error("❌ Error Status:", e.response?.status);
           setError(e?.message ?? "Prediction failed")
         } finally {
           setBusy(false)
