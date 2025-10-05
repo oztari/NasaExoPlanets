@@ -76,6 +76,7 @@ h1 {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: textShimmer 8s linear forwards;
+  margin-left: 7%;
 }
 
 h1 span {
