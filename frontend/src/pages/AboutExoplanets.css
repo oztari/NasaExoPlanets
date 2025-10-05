@@ -1,7 +1,7 @@
 .page-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #000 0%, #1a0033 50%, #000 100%);
-  padding-top: 80px; /* Account for fixed nav */
+  padding-top: 80px;
   color: white;
 }
 

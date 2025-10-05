@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 
 import Navigation from "./components/Navigation";
 
-// Your pages
+// Our pages
 import Home from "./pages/Home";
 import AboutExoplanets from "./pages/AboutExoplanets";
 import ProjectStructure from "./pages/ProjectStructure";
@@ -15,7 +15,7 @@ import Explorer from "./pages/Explorer";
 function App() {
   return (
     <div className="app">
-      {/* your top bar visible everywhere */}
+      {/* our top bar will be visible in every page */}
       <Navigation />
 
       <Routes>
