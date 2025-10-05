@@ -40,7 +40,16 @@ const AboutExoplanets = () => {
           <h2>How We Detect Exoplanets</h2>
           <div className="detection-methods">
             <div className="method-card">
-              <h3>Transit Method</h3>
+                <h3>
+                <a
+                  href="https://svs.gsfc.nasa.gov/13022"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="method-link"
+                >
+                  Transit Method
+                </a>
+                </h3>
               <p>
                 We observe the slight dimming of a star's light when a planet passes in front of it. 
                 This method was used by the Kepler Space Telescope to discover thousands of exoplanets.
