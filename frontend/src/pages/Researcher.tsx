@@ -46,6 +46,8 @@
       }
 
       return (
+    <div style={{ marginLeft: '48px', padding: '24px', minHeight: '100vh' }}>
+      <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-3 gap-6">
           <br />
           <br />
@@ -95,5 +97,7 @@
             </pre>
           </section>
         </div>
-      )
+      </div>
+    </div>
+  )
     }
