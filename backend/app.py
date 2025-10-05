@@ -1,6 +1,7 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel  
+import joblib
 from pathlib import Path
 from typing import Optional, Dict, Any
 import joblib
@@ -245,6 +246,32 @@ def health():
     ok = all(x is not None for x in [globals().get("lr_model"), globals().get("rf_model")])
     return {"ok": ok}
 
+@app.post("/predict")
+def predict(data: ExoplanetData, model: str = "rf"):
+    print("Received request")
+    input_df = pd.DataFrame([data.dict()])
+
+    if model == "lr":
+        print("Model. LR chosen")
+        input_df = align_to_model_columns(input_df, lr_model)
+        raw_pred = lr_model.predict(input_df)[0]
+        pred = remap_prediction(raw_pred, lr_mapping)  # ✅ remap
+        proba = lr_model.predict_proba(input_df).max()
+    else:
+        print("Model RF chosen")
+        input_df = align_to_model_columns(input_df, rf_model)
+        print("formatted to align with model columns", input_df)
+        raw_pred = rf_model.predict(input_df)[0]
+        print("Raw predictions")
+        pred = remap_prediction(raw_pred, rf_mapping)  # ✅ remap
+        print("Remap prediction")
+        proba = rf_model.predict_proba(input_df).max()
+        print("predict probe")
+
+    # ✅ Clean probability
+    if np.isnan(proba) or np.isinf(proba):
+        proba = 0.0
+
 @app.get("/versions")
 def versions():
     try:
@@ -258,29 +285,29 @@ def versions():
         "rf_saved": rf_saved,
     }
 
-@app.post("/predict")
-def predict(data: ExoplanetData, model: str = "lr"):
-    try:
-        m, mapping = choose_model(model)
-        df = pd.DataFrame([data.dict()])
-        df = align_to_model_columns(df, m)
+# @app.post("/predict")
+# def predict(data: ExoplanetData, model: str = "lr"):
+#     try:
+#         m, mapping = choose_model(model)
+#         df = pd.DataFrame([data.dict()])
+#         df = align_to_model_columns(df, m)
 
-        raw_pred = m.predict(df)[0]
-        pred = remap_prediction(str(raw_pred), mapping)
+#         raw_pred = m.predict(df)[0]
+#         pred = remap_prediction(str(raw_pred), mapping)
 
-        proba = get_confidence(m, df) 
-        if np.isnan(proba) or np.isinf(proba):
-            proba = 0.0
-        proba = max(0.0, min(1.0, float(proba)))  
+#         proba = get_confidence(m, df) 
+#         if np.isnan(proba) or np.isinf(proba):
+#             proba = 0.0
+#         proba = max(0.0, min(1.0, float(proba)))  
 
-        return {"prediction": pred, "confidence": round(proba, 3)}
-    except HTTPException:
-        raise
-    except Exception as e:
-        msg = str(e)
-        if "monotonic_cst" in msg or "has no attribute 'monotonic_cst'" in msg:
-            msg += " | Possible scikit-learn version mismatch between training and runtime. Check /versions and align sklearn versions."
-        raise HTTPException(status_code=500, detail=f"prediction failed: {msg}")
+#         return {"prediction": pred, "confidence": round(proba, 3)}
+#     except HTTPException:
+#         raise
+#     except Exception as e:
+#         msg = str(e)
+#         if "monotonic_cst" in msg or "has no attribute 'monotonic_cst'" in msg:
+#             msg += " | Possible scikit-learn version mismatch between training and runtime. Check /versions and align sklearn versions."
+#         raise HTTPException(status_code=500, detail=f"prediction failed: {msg}")
 
 @app.get("/koi/list")
 def list_koi():
