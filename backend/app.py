@@ -281,4 +281,42 @@ def predict(data: ExoplanetData, model: str = "rf"):
         if "monotonic_cst" in msg or "has no attribute 'monotonic_cst'" in msg:
             msg += " | Possible scikit-learn version mismatch between training and runtime. Check /versions and align sklearn versions."
         raise HTTPException(status_code=500, detail=f"prediction failed: {msg}")
+
+@app.get("/koi/list")
+def list_koi():
+    """Return a list of KOI objects for the Explorer page"""
+    try:
+        # Load the exoplanets data
+        data_path = BASE_DIR.parent / "data" / "raw" / "exoplanets_2025.csv"
+        df = pd.read_csv(data_path)
+        
+        # Select relevant columns for the Explorer
+        columns = [
+            'kepid', 'kepoi_name', 'koi_disposition', 'koi_period', 'koi_duration',
+            'koi_depth', 'koi_prad', 'koi_model_snr', 'koi_snr', 'koi_score',
+            'koi_ror', 'koi_impact', 'koi_max_mult_ev', 'koi_fpflag_ss',
+            'koi_fpflag_co', 'koi_fpflag_nt', 'koi_fpflag_ec'
+        ]
+        
+        # Filter to only include columns that exist in the data
+        existing_columns = [col for col in columns if col in df.columns]
+        df_filtered = df[existing_columns].copy()
+        
+        # Convert to list of dictionaries and handle NaN values
+        koi_list = []
+        for _, row in df_filtered.iterrows():
+            koi_item = {}
+            for col in existing_columns:
+                value = row[col]
+                # Convert NaN to None for JSON serialization
+                if pd.isna(value):
+                    koi_item[col] = None
+                else:
+                    koi_item[col] = value
+            koi_list.append(koi_item)
+        
+        return koi_list
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to load KOI data: {str(e)}")
     
