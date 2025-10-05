@@ -42,7 +42,7 @@ export default function ExtraResources() {
       avatar: "👨‍💻",
       github: "https://github.com/BobolaObi",
       linkedin: "https://bobolaobi.com/",
-      description: "Frontend and backend development expert. Created the interactive interface for exploring exoplanet data and predictions."
+      description: "Built the API development pipeline and developed frontend features powering the Exoplanet Research dashboard. Integrated the FastAPI backend with the machine learning models and optimized data routing for live exoplanet predictions."
     }
   ];
 
