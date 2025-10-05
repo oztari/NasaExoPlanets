@@ -34,7 +34,8 @@ app.add_middleware(
 # Load models at startup
 # ----------------------------
 def _patch_sklearn_compat(obj):
-    """
+    """Best-effort patch for scikit-learn backward/forward compatibility.
+
     - Adds missing attributes expected by newer sklearn versions on older pickles,
       e.g., DecisionTreeClassifier.monotonic_cst used by RandomForest trees.
     - Traverses common containers like Pipeline and ensembles.
