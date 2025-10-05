@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { fmt, listKoi, predict } from "../lib/api";
 import { type KOIItem, type PredictPayload, } from "../lib/types";
 import NumberField from "../components/NumberField";
