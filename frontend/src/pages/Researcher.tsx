@@ -29,9 +29,12 @@
       async function handlePredict() {
         try {
           setBusy(true); setError(null)
+          console.log("🚀 Starting prediction with:", { payload, model })
           const data = await predict(payload, model)
+          console.log("✅ Prediction successful:", data)
           setResult(data)
         } catch (e: any) {
+          console.error("❌ Prediction error:", e)
           setError(e?.message ?? "Prediction failed")
         } finally {
           setBusy(false)
