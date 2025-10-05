@@ -2,7 +2,7 @@
 import { useState } from "react"
 import { predict } from "../lib/api"
 import type { PredictPayload } from "../lib/types"
-import "./researcher.css"
+import "./Researcher.css"
 
 const DEFAULTS: PredictPayload = {
   koi_period: 10.5,
@@ -106,9 +106,10 @@ export default function Researcher() {
 
   async function handlePredict() {
     try {
+      console.log("Payload", payload)
       setBusy(true); setError(null)
-      // ✅ Sends the exact current payload + model to the API
       const data = await predict(payload, model)
+      console.log("Data received from backend:", data)
       setResult(data)
     } catch (e: any) {
       setError(e?.message ?? "Prediction failed")
