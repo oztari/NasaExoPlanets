@@ -2,7 +2,7 @@
 import { useState } from "react"
 import { predict } from "../lib/api"
 import type { PredictPayload } from "../lib/types"
-import "./researcher.css"
+import "./Researcher.css"
 
 const DEFAULTS: PredictPayload = {
   koi_period: 10.5,
