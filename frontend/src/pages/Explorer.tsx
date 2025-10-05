@@ -51,7 +51,7 @@ export default function Explorer() {
     if (!sim) return
     setBusy(true)
     // const out = await predict(sim, "rf")
-    const out = await predict(sim, "lr")
+    const out = await predict(sim, "rf")
 
     setResult(out)
     setBusy(false)
