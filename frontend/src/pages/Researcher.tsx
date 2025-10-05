@@ -48,13 +48,13 @@
       return (
     <div style={{ marginLeft: '48px', padding: '24px', minHeight: '100vh' }}>
       <div className="max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-8">
           <br />
           <br />
           <br />
           <br />
           <br />
-             <div className="mt-4 flex items-center gap-3">
+             <div className="mt-8 flex items-center gap-4">
               <select className="select w-48" value={model} onChange={e => setModel(e.target.value as "rf" | "lr")}>
                 <option value="rf">Random Forest</option>
                 <option value="lr">Logistic Regression</option>
@@ -63,8 +63,8 @@
               {error && <span className="text-red-400">{error}</span>}
             </div>
           <section className="card md:col-span-2">
-            <h2 className="text-xl font-semibold">Researcher Dashboard</h2>
-            <div className="grid md:grid-cols-2 gap-4 mt-4">
+            <h2 className="text-xl font-semibold mb-6">Researcher Dashboard</h2>
+            <div className="grid md:grid-cols-2 gap-6 mt-6">
               <NumberField label="koi_period (days)" value={payload.koi_period ?? null} onChange={v => set("koi_period", v)} min={0.05} max={1000} step={0.05} />
               <NumberField label="koi_duration (hours)" value={payload.koi_duration ?? null} onChange={v => set("koi_duration", v)} min={0.05} max={30} step={0.05} />
               <NumberField label="koi_depth (ppm)" value={payload.koi_depth ?? null} onChange={v => set("koi_depth", v)} min={5} max={100000} step={5} />
@@ -73,6 +73,10 @@
               <NumberField label="koi_ror (Rp/R★)" value={payload.koi_ror ?? null} onChange={v => set("koi_ror", v)} min={0} max={0.2} step={0.001} />
               <NumberField label="koi_impact (b)" value={payload.koi_impact ?? null} onChange={v => set("koi_impact", v)} min={0} max={1.2} step={0.01} />
               <NumberField label="koi_max_mult_ev" value={payload.koi_max_mult_ev ?? null} onChange={v => set("koi_max_mult_ev", v)} min={0} max={10} step={1} />
+            </div>
+
+            {/* Add more space between sections */}
+            <div className="mt-8 space-y-4">
               <ToggleField label="koi_fpflag_ss (stellar variability FP)" value={payload.koi_fpflag_ss ?? 0} onChange={v => set("koi_fpflag_ss", v)} />
               <ToggleField label="koi_fpflag_co (centroid offset FP)" value={payload.koi_fpflag_co ?? 0} onChange={v => set("koi_fpflag_co", v)} />
               <ToggleField label="koi_fpflag_nt (not transit-like)" value={payload.koi_fpflag_nt ?? 0} onChange={v => set("koi_fpflag_nt", v)} />
@@ -83,16 +87,16 @@
           </section>
 
           <section className="card">
-            <h3 className="text-lg font-semibold">Result</h3>
-            <div className="mt-2">
+            <h3 className="text-lg font-semibold mb-4">Result</h3>
+            <div className="mt-4">
               {result ? (
-                <div>
+                <div className="space-y-3">
                   <div className="text-white/90 text-xl">{result.prediction}</div>
                   <div className="text-white/70">Confidence: {(result.confidence * 100).toFixed(1)}%</div>
                 </div>
               ) : <div className="text-white/60">No prediction yet.</div>}
             </div>
-            <pre className="mt-4 text-xs bg-black/30 rounded-xl p-3 overflow-auto">
+            <pre className="mt-6 text-xs bg-black/30 rounded-xl p-3 overflow-auto">
 {JSON.stringify(payload, null, 2)}
             </pre>
           </section>
