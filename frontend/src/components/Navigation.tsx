@@ -30,6 +30,12 @@ const Navigation = () => {
           >
             Project Structure
           </Link>
+          <Link 
+            to="/extra-resources" 
+            className={location.pathname === '/extra-resources' ? 'nav-link active' : 'nav-link'}
+          >
+            Extra Resources
+          </Link>
         </div>
       </div>
     </nav>

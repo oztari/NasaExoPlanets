@@ -7,6 +7,7 @@ import Navigation from "./components/Navigation";
 import Home from "./pages/Home";
 import AboutExoplanets from "./pages/AboutExoplanets";
 import ProjectStructure from "./pages/ProjectStructure";
+import ExtraResources from "./pages/ExtraResources";
 
 // Team pages
 import Researcher from "./pages/Researcher";
@@ -24,6 +25,7 @@ function App() {
         <Route path="/project-structure" element={<ProjectStructure />} />
         <Route path="/researcher" element={<Researcher />} />
         <Route path="/explorer" element={<Explorer />} />
+        <Route path="/extra-resources" element={<ExtraResources />} />
       </Routes>
     </div>
   );
