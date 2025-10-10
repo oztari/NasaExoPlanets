@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Response ##Currently not in use in this program
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel  
 import joblib
@@ -12,15 +12,15 @@ import sklearn
 # ----------------------------
 # Model paths
 # ----------------------------
-BASE_DIR = Path(__file__).resolve().parent
-MODEL_DIR = BASE_DIR.parent / "notebooks" / "models"
-LR_PATH = MODEL_DIR / "logistic_regression_pipeline.joblib"
-RF_PATH = MODEL_DIR / "random_forest_pipeline.joblib"
+BASE_DIR = Path(__file__).resolve().parent # Directory where this file lives
+MODEL_DIR = BASE_DIR.parent / "notebooks" / "models" # Points to where ../notebooks/models is relative to this file
+LR_PATH = MODEL_DIR / "logistic_regression_pipeline.joblib" # File path for the LR ML model
+RF_PATH = MODEL_DIR / "random_forest_pipeline.joblib" # File path for the RF ML model
 
 # ----------------------------
 # App
 # ----------------------------
-app = FastAPI(title="Exoplanet Classifier API")
+app = FastAPI(title="Exoplanet Classifier API") # Creating a FastAPI with a title. This basically initializes the webapp
 
 # Allow your Vite dev server to call the API
 app.add_middleware(
@@ -98,6 +98,8 @@ def _patch_sklearn_compat(obj):
 
     visit(obj)
 
+# Runs once when the API starts and loads the LR and RF ML model pipelines.
+# Defines a stable label order to prevent swapped results.
 @app.on_event("startup")
 def load_models():
     global lr_model, rf_model, lr_mapping, rf_mapping
@@ -112,6 +114,7 @@ def load_models():
     # Example standard names. Adjust if your canonical labels differ.
     STANDARD_ORDER = ["Candidate", "Confirmed", "False Positive"]
 
+# Creates a mapping: ensures model classes are consistently renamed/aligned.
     def build_mapping(model) -> Dict[str, str]:
         if not hasattr(model, "classes_"):
             raise RuntimeError("Model is missing classes_. It must be a classifier.")
@@ -145,6 +148,8 @@ def load_models():
 
 # ----------------------------
 # Request model
+# Defines the input JSON structure for the /predict endpoint
+# Each attribute is optional so missing fields wont cause errors
 # ----------------------------
 class ExoplanetData(BaseModel):
     koi_period: Optional[float] = None
@@ -165,6 +170,10 @@ class ExoplanetData(BaseModel):
 # ----------------------------
 # Helpers
 # ----------------------------
+
+# Ensures input DataFrame matches what the ML model expects
+# Adds missing columns as NaN
+# Reorders columns to match training
 def align_to_model_columns(df: pd.DataFrame, model) -> pd.DataFrame:
     expected = None
 
@@ -189,13 +198,20 @@ def align_to_model_columns(df: pd.DataFrame, model) -> pd.DataFrame:
 
     return df[expected]
 
+# Converts raw model outputs (e.g. "CAND") into clean labels ("Candidate")
+
 def remap_prediction(pred: Any, mapping: Dict[str, str]) -> str:
     pred_str = str(pred)
     return mapping.get(pred_str, pred_str)
 
+# Extracts the sklearn version used when the model was saved
 def get_saved_sklearn_version(model):
     return getattr(model, "_sklearn_version", getattr(model, "__sklearn_version__", "unknown"))
 
+# Returns a probability/confidence score:
+#   If model has predict_proba: use it
+#   If not: use decision_function and convert via sigmoid/softmax
+#   Otherwise: fallback = 0.0
 def get_confidence(model, X):
     """Return a confidence score even if the estimator lacks predict_proba."""
     import numpy as np
@@ -226,6 +242,8 @@ def get_confidence(model, X):
     # Last resort
     return 0.0
 
+# Selects logistic regression model or random forest model based on model string
+# Raises error if invalid
 def choose_model(name: str):
     name = (name or "").lower()
     if name == "lr":
@@ -237,15 +255,23 @@ def choose_model(name: str):
 # ----------------------------
 # Routes
 # ----------------------------
+
+# Simple landing page
 @app.get("/")
 def root():
     return {"message": "Welcome to the Exoplanet Classifier API 🚀"}
 
+# Confirms models loaded properly
 @app.get("/health")
 def health():
     ok = all(x is not None for x in [globals().get("lr_model"), globals().get("rf_model")])
     return {"ok": ok}
 
+# Prediction route that accepts JSON input following ExoplanetData
+# Default model is set to Random Forest "rf"
+# converts input  -> data frame -> aligns columns -> Feeds into chosen model
+# Gets prediction + probability
+# Returns JSON : "prediction" and "confidence"
 @app.post("/predict")
 def predict(data: ExoplanetData, model: str = "rf"):
     print("Received request")
@@ -274,6 +300,8 @@ def predict(data: ExoplanetData, model: str = "rf"):
 
     return {"prediction": pred, "confidence": round(proba, 3)}
 
+# Uses sklearn runtime vesion and model pickle versions.
+# Useful to debug version mismatches
 @app.get("/versions")
 def versions():
     try:
@@ -287,30 +315,9 @@ def versions():
         "rf_saved": rf_saved,
     }
 
-# @app.post("/predict")
-# def predict(data: ExoplanetData, model: str = "lr"):
-#     try:
-#         m, mapping = choose_model(model)
-#         df = pd.DataFrame([data.dict()])
-#         df = align_to_model_columns(df, m)
-
-#         raw_pred = m.predict(df)[0]
-#         pred = remap_prediction(str(raw_pred), mapping)
-
-#         proba = get_confidence(m, df) 
-#         if np.isnan(proba) or np.isinf(proba):
-#             proba = 0.0
-#         proba = max(0.0, min(1.0, float(proba)))  
-
-#         return {"prediction": pred, "confidence": round(proba, 3)}
-#     except HTTPException:
-#         raise
-#     except Exception as e:
-#         msg = str(e)
-#         if "monotonic_cst" in msg or "has no attribute 'monotonic_cst'" in msg:
-#             msg += " | Possible scikit-learn version mismatch between training and runtime. Check /versions and align sklearn versions."
-#         raise HTTPException(status_code=500, detail=f"prediction failed: {msg}")
-
+# Loads raw dataset (exoplanets_2025.csv), selects relevant columns
+# Converts each row into JSON serializable dict
+# Returns list of KOI entires for frontend explorer
 @app.get("/koi/list")
 def list_koi():
     """Return a list of KOI objects for the Explorer page"""
