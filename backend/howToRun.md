@@ -114,10 +114,10 @@ Expected response (values will vary):
 ```
 
 ## 6) Notes
-- Model files must exist here:
+- Model files must exist here: /notebooks/models
   ```
-  backend/models/logistic_regression_pipeline.joblib
-  backend/models/random_forest_pipeline.joblib
+  notebooks/models/logistic_regression_pipeline.joblib
+  notebooks/models/random_forest_pipeline.joblib
   ```
 - Stop the server with `CTRL + C`.
 - If you see scikit-learn version warnings, align versions:

@@ -1,3 +1,5 @@
+// TypeScript type definition file
+// Defines the data contracts between frontend and backend, so TypeScript can check that the API calls and React components are passing/receiving the right shape of data.
 export type ModelName = "rf" | "lr"
 
 export type PredictPayload = {

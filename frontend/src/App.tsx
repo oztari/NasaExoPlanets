@@ -1,61 +1,37 @@
+// The central router + layout of the frontend:
+// Always shows the Navigation bar.
+// Switches between different pages based on the URL.
+// Acts as the skeleton of the SPA (Single Page Application).
 import "./App.css";
-import { useNavigate, Routes, Route } from "react-router-dom";
-import Explorer from "./pages/Explorer";
+import { Routes, Route } from "react-router-dom";
+
+import Navigation from "./components/Navigation";
+
+// Informational pages
+import Home from "./pages/Home";
+import AboutExoplanets from "./pages/AboutExoplanets";
+import ProjectStructure from "./pages/ProjectStructure";
+import ExtraResources from "./pages/ExtraResources";
+
+// Interactive pages with user features
 import Researcher from "./pages/Researcher";
+import Explorer from "./pages/Explorer";
 
 function App() {
-  const navigate = useNavigate();
-
   return (
-    <>
+    <div className="app">
+      {/* the navbar will be visible in every page */}
+      <Navigation />
+
       <Routes>
-        <Route
-          path="/"
-          element={
-            <div className="hero">
-              <nav>
-                <a
-                  href="https://github.com/oztari/Nasa-Exoplanet-Detector"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  #Analysis Github
-                </a>
-                <a
-                  href="https://github.com/Hadiyahh/exoplanet-app"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  #Design Github
-                </a>
-              </nav>
-
-              <h1>
-                A World Away<span>🚀</span>
-              </h1>
-              <h2>Hunting for Exoplanets with AI</h2>
-              <p>With Artificial Intelligence and Machine Learning</p>
-
-              <div className="btn-container">
-                <button className="btn" onClick={() => navigate("/researcher")}>
-                  For Researchers
-                </button>
-                <button
-                  className="btn"
-                  onClick={() => navigate("/explorer")}
-                >
-                  For Enthusiasts
-                </button>
-              </div>
-
-              <footer>2025 NASA Space Apps Challenge</footer>
-            </div>
-          }
-        />
+        <Route path="/" element={<Home />} />
+        <Route path="/about-exoplanets" element={<AboutExoplanets />} />
+        <Route path="/project-structure" element={<ProjectStructure />} />
         <Route path="/researcher" element={<Researcher />} />
         <Route path="/explorer" element={<Explorer />} />
+        <Route path="/extra-resources" element={<ExtraResources />} />
       </Routes>
-    </>
+    </div>
   );
 }
 

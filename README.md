@@ -1,4 +1,8 @@
-# Exoplanet KOI DR25 Binary & Multiclass Study — Methods & Results (Detailed)
+## ▶️ **Live App**
+[**Open the App »**](https://nasa-exo-planets.vercel.app/)  
+**https://nasa-exo-planets.vercel.app/**
+
+# Exoplanet KOI DR25 Binary & Multiclass Study — Methods & Results
 
 > **Objective (Binary):** Learn to predict the Kepler pipeline’s *triage decision*—whether a KOI is a **CANDIDATE (1)** or **FALSE POSITIVE (0)**—using astrophysical/diagnostic features **without** relying on pipeline meta-outputs that trivially encode the label.
 >
@@ -233,7 +237,7 @@
 
 ---
 
-## 9) Decisions You Made — Rationale & What to Tell Reviewers
+## 9) Rationale
 
 1. **Targeted the pipeline triage, not confirmation.**
 

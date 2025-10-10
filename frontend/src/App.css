@@ -8,7 +8,11 @@ body {
   font-family: 'Poppins', sans-serif;
   color: white;
   background: black;
-  overflow: hidden;
+  padding-top: 105px; /* same as navbar height */
+}
+
+.app {
+  min-height: 100vh;
 }
 
 @keyframes pulseGlow {
@@ -57,26 +61,6 @@ body {
   z-index: 0;
 }
 
-nav {
-  position: absolute;
-  top: 20px;
-  right: 50px;
-  display: flex;
-  gap: 30px;
-  font-size: 14px;
-  letter-spacing: 1px;
-}
-
-nav a {
-  color: #ddd;
-  text-decoration: none;
-  transition: color 0.3s;
-}
-
-nav a:hover {
-  color: white;
-}
-
 h1 {
   font-size: 80px;
   z-index: 1;
@@ -89,9 +73,11 @@ h1 {
     rgba(230, 230, 255, 0.4) 100%
   );
   background-size: 200% 100%;
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: textShimmer 8s linear forwards;
+  margin-left: 7%;
 }
 
 h1 span {
@@ -134,6 +120,9 @@ p {
   cursor: pointer;
   transition: background 0.3s, transform 0.3s;
   z-index: 1;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
 }
 
 .btn:hover {
@@ -147,4 +136,37 @@ footer {
   font-size: 10px;
   letter-spacing: 3px;
   color: rgba(255, 255, 255, 0.6);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .hero {
+    padding: 1rem;
+  }
+
+  h1 {
+    font-size: 3rem;
+  }
+
+  h2 {
+    font-size: 1rem;
+    letter-spacing: 2px;
+  }
+
+  .btn-container {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .btn {
+    width: 100%;
+    max-width: 250px;
+  }
+
+  footer {
+    position: relative;
+    bottom: auto;
+    margin-top: 2rem;
+  }
 }

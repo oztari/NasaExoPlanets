@@ -1,72 +1,84 @@
-Exoplanet Detection — Model Documentation
-1. Introduction
-Goal: classify Kepler Objects of Interest (KOIs) into Confirmed planets, Candidates, or False Positives.
-Dataset: NASA Kepler KOI catalog (exoplanets_2025.csv).
-Models trained: Logistic Regression (baseline) and Random Forest (primary model).
-2. Data Preparation
-Loaded dataset, mapped koi_disposition → {Confirmed, Candidate, False Positive}.
-Dropped rows without labels.
-Selected numeric features only.
-Removed:
-Columns with only NaN.
-Columns with no variance (only one value).
-Replaced infinities with NaN.
-Train/test split: 60% train, 40% test, stratified by class.
-3. Models and Training
-Logistic Regression (LR)
-Preprocessing: Median imputation + StandardScaler.
-Multinomial Logistic Regression.
-Class weights: {Confirmed: 3, Candidate: 2, False Positive: 1}.
-Max iterations: 5000 (to ensure convergence).
-Purpose: interpretable baseline.
-Random Forest (RF)
-Preprocessing: Median imputation.
-Random Forest Classifier with:
-300 trees.
-max_depth=20, min_samples_leaf=10.
-Class weights: {Confirmed: 3, Candidate: 2, False Positive: 1}.
-n_jobs=-1 for parallel training.
-Purpose: more flexible non-linear model.
-4. Evaluation
-Metrics Used
-Confusion matrices.
-Precision, Recall, F1-scores (per-class, macro, weighted).
-Precision–Recall curves for each class.
-Threshold tuning for "Confirmed" class (0.5 → 0.9).
-Calibration curve (checked probability reliability).
-Results Summary
-Logistic Regression: interpretable but limited — struggles with complex feature interactions.
-Random Forest:
-Better precision–recall tradeoff, especially for "Confirmed".
-Feature importance highlights astrophysical signals:
-koi_score (overall reliability),
-koi_prad (planet radius),
-koi_period (orbital period),
-koi_depth (transit depth),
-koi_model_snr (signal-to-noise ratio).
-Calibrated probabilities are reliable at higher thresholds.
-5. Threshold Tuning (Confirmed class)
-At 0.8 threshold, RF achieved:
-Very high precision (≥95%) for Confirmed planets.
-Slight drop in recall (some Confirmed missed).
-This tradeoff matches NASA’s goal of minimizing false positives.
-6. Model Comparison
-Model	Accuracy	Macro Precision	Macro Recall	Macro F1	Weighted F1
-Logistic Regression	XX%	XX	XX	XX	XX
-Random Forest	XX%	XX	XX	XX	XX
-(Replace XX with the metrics you printed in your code)
-7. Conclusion
-Logistic Regression = interpretable baseline.
-Random Forest = better predictive performance, feature insights, and more robust to noise.
-RF is the preferred model for exoplanet detection in this workflow.
-Models and metrics saved under models/ for reproducibility.
-8. Next Steps
-Explore hyperparameter tuning (grid search, Bayesian optimization).
-Try gradient boosting models (XGBoost, LightGBM).
-Incorporate astrophysical priors or domain knowledge.
-Test on future exoplanet candidate datasets (TESS, PLATO).
+# Notebooks – Model Development and Analysis
+
+This folder documents the iterative development of machine learning models for the **Exoplanet Detector web application**.  
+Each notebook represents a distinct stage of experimentation, showing how the models evolved from a simple baseline to the final production-ready pipelines.
+
+The **final selected models** are the **Logistic Regression (LR)** and **Random Forest (RF)** pipelines developed in `multiclass_analysis.ipynb`.
 
 
+## 📑 Notebook Summaries
+
+### 1. `baseline_model.ipynb`
+- **Goal:** Create a simple benchmark for classification.
+- **Modifications:**
+  - Minimal preprocessing; used raw Kepler KOI features without heavy cleaning.
+  - Included all available astrophysical and diagnostic features (e.g., `koi_fpflag_*`, `koi_score`).
+- **Why:** Establish a “control” performance level for comparison with future models.
+- **Interpretation of Results:**
+  - Models achieved deceptively high accuracy due to **leakage-prone features** (like NASA’s own `fpflag` fields).
+  - Highlighted the need to carefully filter features to avoid overfitting and trivial predictions.
 
 
-NOTE: The logistic_regression_pipeline.joblib and random_forest_pipeline.joblib were created from the multiclass_analysis.ipynb.
+### 2. `modified_model.ipynb`
+- **Goal:** Improve on the baseline by removing leakage and refining preprocessing.
+- **Modifications:**
+  - **Dropped features:**  
+    - NASA pipeline flags (`koi_fpflag_nt`, `koi_fpflag_ss`, `koi_fpflag_co`, `koi_fpflag_ec`) – they encode the label and cause leakage.  
+    - Direct scoring features like `koi_score` – trivially correlated with disposition.
+  - Applied **feature scaling** for models like Logistic Regression.
+  - Performed **class balancing** experiments to reduce bias toward the dominant “False Positive” class.
+- **Why:** Force the model to learn **real astrophysical patterns** (e.g., orbital period, depth, duration) rather than cheat with metadata.
+- **Interpretation of Results:**
+  - Performance dropped compared to the baseline (expected, since leakage features were removed).  
+  - Provided a more **realistic estimate of generalization power**.
+
+
+### 3. `multiclass_model.ipynb`
+- **Goal:** Transition from binary to **multiclass classification** (`Confirmed`, `Candidate`, `False Positive`).
+- **Modifications:**
+  - Adapted pipelines to handle **3-class targets**.
+  - Dropped the same leakage features as before.  
+  - Added **cross-validation** and stratified sampling to ensure fair evaluation across imbalanced classes.
+- **Why:** The real scientific use case requires distinguishing not just “planet vs not” but also between *candidates* and *confirmed planets*.
+- **Interpretation of Results:**
+  - Logistic Regression showed **interpretability** via coefficients but struggled with recall on minority classes.  
+  - Random Forest performed better overall in multiclass setting, especially in handling nonlinear feature interactions.  
+  - First signs that RF would be the stronger candidate for deployment.
+
+
+### 4. `multiclass_analysis.ipynb`
+- **Goal:** Perform in-depth evaluation and finalize models for production.
+- **Modifications:**
+  - Conducted **calibration analysis** to check probability reliability.
+  - Inspected **feature importances** (RF) and **coefficients** (LR) to interpret what drives predictions:
+    - Orbital period, transit depth, and stellar parameters were key discriminators.
+  - Compared metrics across multiple thresholds (strict vs baseline).
+  - Tuned Random Forest depth and leaf size to reduce overfitting.
+- **Why:** Needed rigorous testing before selecting the final production pipelines.
+- **Interpretation of Results:**
+  - **Logistic Regression (LR):**
+    - Pros: Transparent, interpretable coefficients.  
+    - Cons: Struggles with complex nonlinear separations.  
+  - **Random Forest (RF):**
+    - Pros: Higher recall and balanced accuracy, robust to noise.  
+    - Cons: Less interpretable, but feature importances still provide scientific insight.
+  - **Final Decision:** Both LR and RF pipelines were selected:
+    - **LR** → for transparency and interpretability.  
+    - **RF** → for robustness and stronger predictive performance.
+
+
+## Development Workflow
+
+1. **Baseline:** Start with all features → identified leakage and inflated metrics.  
+2. **Modified:** Drop leakage features, scale inputs → more realistic models.  
+3. **Multiclass:** Move from binary → full NASA disposition classification.  
+4. **Analysis:** Deep evaluation, calibration, interpretation → finalized LR and RF pipelines.  
+
+
+## Final Takeaway
+
+The **Logistic Regression** and **Random Forest** pipelines from `multiclass_analysis.ipynb` represent the **final, production-ready models** used in the Exoplanet Detector web application.  
+
+Earlier notebooks serve as a record of the **iterative scientific process**: testing, refining, and justifying design decisions in a transparent and reproducible way.
+
+
