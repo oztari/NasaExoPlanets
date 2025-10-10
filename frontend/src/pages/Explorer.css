@@ -4,7 +4,7 @@
   background: radial-gradient(circle at top, rgba(100, 60, 255, 0.3), #000 70%),
     url('https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&q=80&w=1920')
       center/cover no-repeat;
-  padding: 6rem 2rem 2rem 2rem;
+  padding: 8rem 2rem 2rem 2rem;
   position: relative;
 }
 

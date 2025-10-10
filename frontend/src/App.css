@@ -8,6 +8,7 @@ body {
   font-family: 'Poppins', sans-serif;
   color: white;
   background: black;
+  padding-top: 105px; /* same as navbar height */
 }
 
 .app {

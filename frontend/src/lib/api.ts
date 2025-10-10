@@ -1,3 +1,7 @@
+// Frontend api layer that centralizes all calls to the FastAPI backend
+// Exports functions (predict, listKoi) that components can use without worrying about HTTP details.
+// Provides a fallback (sample JSON) so the UI isn’t broken if the backend is offline.
+// Includes a formatter helper for clean display of numbers.
 import axios from "axios"
 import type { KOIItem, ModelName, PredictPayload, PredictResponse } from "./types"
 

@@ -43,13 +43,15 @@ function FieldRow(props: {
         <input
           type="number"
           className="field__number"
-          value={Number.isFinite(value) ? value : min}
+          // value={Number.isFinite(value) ? value : min}
+          value={value}
           min={min}
           max={max}
           step={step}
           onChange={(e) => {
             const v = e.target.value === "" ? NaN : Number(e.target.value)
-            onChange(k, Number.isFinite(v) ? v : min)
+            // onChange(k, Number.isFinite(v) ? v : min)
+            onChange(k, v)
           }}
         />
         <input

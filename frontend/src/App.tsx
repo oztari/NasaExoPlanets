@@ -1,22 +1,26 @@
+// The central router + layout of the frontend:
+// Always shows the Navigation bar.
+// Switches between different pages based on the URL.
+// Acts as the skeleton of the SPA (Single Page Application).
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
 
 import Navigation from "./components/Navigation";
 
-// Our pages
+// Informational pages
 import Home from "./pages/Home";
 import AboutExoplanets from "./pages/AboutExoplanets";
 import ProjectStructure from "./pages/ProjectStructure";
 import ExtraResources from "./pages/ExtraResources";
 
-// Team pages
+// Interactive pages with user features
 import Researcher from "./pages/Researcher";
 import Explorer from "./pages/Explorer";
 
 function App() {
   return (
     <div className="app">
-      {/* our top bar will be visible in every page */}
+      {/* the navbar will be visible in every page */}
       <Navigation />
 
       <Routes>
